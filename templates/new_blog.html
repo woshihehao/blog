@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>表单</title>
+</head>
+<body>
+
+<form action="{{ url_for('add_blog') }}" method="post">
+<p>博名: <input name="title" type="text"></p>
+<p>内容: </br>
+    <textarea   cols="50" rows="10" name="content" ></textarea></p>
+
+     <input type="submit" value="分享">
+</form>
+
+</body>
+</html>

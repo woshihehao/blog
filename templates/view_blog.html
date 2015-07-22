@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+</head>
+<body>
+
+    <div class="blog-container">
+        <h2>{{ blog[1] }}</h2>
+        <p>{{ blog[2] }}</p>
+
+        <div class="right">
+            <a href="{{ url_for('blog_list') }}">Blog list</a>
+        </div>
+    </div>
+
+</body>
+</html>
