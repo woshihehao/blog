@@ -1,6 +1,6 @@
 import os
 from sqlite3 import dbapi2 as sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import Flask, request, session, g, redirect, url_for, render_template, abort
 
 
 # create our little application :)
@@ -29,6 +29,8 @@ def execute_sql(sql, args=()):#sqlite3's operators
     cur.close()
     return result
 
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -39,6 +41,8 @@ def close_connection(exception):
 
 @app.route('/')
 def index():
+    if 'username' in session:
+        print 'Logged in as %s' % session['username']
     return redirect(url_for('login'))
 
 
@@ -46,10 +50,8 @@ def index():
 def login():
     error = None
     if request.method == 'POST':
-        db = get_db()
-        cur = db.cursor()
-        cur.execute("create table if not exists user( username char(20), password char(50))")
-        cur.close()
+
+
         if execute_sql("select username from user where username = ?", (request.form['username'],))== []:
             error = 'Invalid username'
             return render_template('login.html', error=error)
@@ -57,17 +59,23 @@ def login():
             error = 'Invalid password'
             return render_template('login.html', error=error)
         else:
+            session['username'] = request.form['username']
+            session['logged_in'] = True
             return redirect(url_for('blog_list'))
     else:
         return render_template('login.html')
 
 
+@app.route('/logout')
+def logout():
+
+    session.pop('username', None)
+    session.pop('logged_in', None)
+    return redirect(url_for('index'))
+
 @app.route('/blog')
 def blog_list():
-    db = get_db()
-    cur = db.cursor()
-    cur.execute("create table if not exists blog(id integer primary key autoincrement,title text not null,content text not null)")
-    cur.close()
+
     blogs = execute_sql("SELECT * FROM blog ORDER BY id DESC")
     return render_template('blog_list.html', blogs=blogs)
 
@@ -82,15 +90,15 @@ def blog(blog_id):
 
 @app.route('/blog/add', methods=['GET', 'POST'])
 def add_blog():
+    if not session.get('logged_in'):
+        abort(401)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
 
         title = request.form['title']
         content = request.form['content']
 
         execute_sql("INSERT INTO blog VALUES (NULL ,? ,?)", (title, content))
-
-
         return redirect(url_for('blog_list'))
     else:
         return render_template('new_blog.html')

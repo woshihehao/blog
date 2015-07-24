@@ -11,13 +11,17 @@
 
 </style>
 </head>
+{% if session['logged_in'] %}
 <body background="static/23I58PICyJv_1024.jpg">
+
 
 
 
     <div id="header">
         <h1 > Blog List</h1>
+        <h2 > {{ session['username'] }} </h2>
     </div>
+
         <div id="menu">
         <h2>Menu</h2>
         <ul >
@@ -28,9 +32,9 @@
             {% endfor %}
         </ul>
              <a href="{{ url_for('add_blog') }}">Add one</a>
-
+              <a href="{{ url_for('logout') }}">logout</a>
 
     </div>
-
 </body>
+{% endif %}
 </html>
